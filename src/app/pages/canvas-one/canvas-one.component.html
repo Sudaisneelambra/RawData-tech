@@ -1,11 +1,12 @@
-<div class="main-container w-full h-full ">
-    <div class="images w-full !h-[200px] flex justify-around ">
-        <div *ngFor="let image of images" class="h-full   border-[black]" >
-            <img [src]="image.url" [alt]="image.alt" class="h-full w-[200px]" (click)="selectImage(image)" [class.selected]="isImageSelected(image)"/>
+<div class="main-container w-full h-screen backdrop:blur-xl bg-[#8571718e]">
+    <div class="images w-full !h-[220px] flex justify-around bg-[#1f1d1d1e] p-2 !pt-1 !pb-4 flex-col">
+        <h1 class=" text-center">Click to select Image</h1>
+        <div class="h-[90%]   border-[black]   flex justify-around" >
+            <img *ngFor="let image of images"  [src]="image.url" [alt]="image.alt" class="h-full w-[200px] rounded-lg" (click)="selectImage(image)" [class.selected]="imageSelected(image)"/>
         </div>
     </div>
-    <div class="w-full h-full flex justify-center items-center">
-        <canvas id="firstCanvas" width="600" height="800" class="border-2 "> </canvas>
-        <canvas id="secondCanvas" width="600" height="800" class="border-2 "></canvas>
+    <div class="w-full flex items-center  p-[30px] justify-evenly">
+        <canvas id="firstCanvas" width="600" height="650" class="shadow-2xl bg-[#d6cece8a]"> </canvas>
+        <canvas id="secondCanvas" width="600" height="650" class="shadow-2xl rounded-2xl bg-[#d6cece8a]"></canvas>
     </div>
 </div>

@@ -11,7 +11,7 @@ export class CanvasOneComponent implements OnInit, OnDestroy {
   draggingImage: any = null;
   offsetX: number = 0;
   offsetY: number = 0;
-  originalCanvas: string = ''; 
+  secondCanvasImage:any
 
   images = [
     { url: '/assets/images/imageOne.jpeg', alt: 'imageOne' },
@@ -29,31 +29,39 @@ export class CanvasOneComponent implements OnInit, OnDestroy {
     canvas.addEventListener('mousemove', (event) => this.onMouseMove(event));
     canvas.addEventListener('mouseup', () => this.onMouseUp('firstCanvas'));
 
-    canvasTwo.addEventListener('mousedown', (event) => this.onMouseDown(event, 'secondCanvas'));
-    canvasTwo.addEventListener('mousemove', (event) => this.onMouseMove(event));
     canvasTwo.addEventListener('mouseup', () => this.onMouseUp('secondCanvas'));
   }
 
-  isImageSelected(imageFile: any): boolean {
+
+  /**checking image is already exist or not */
+  imageSelected(imageFile: any): boolean {
     return this.selectedImages.some(img => img.url === imageFile.url && img.alt === imageFile.alt);
   }
 
+  /**selecting image and push into array */
   selectImage(imageFile: any) {
-    if (!this.isImageSelected(imageFile)) {
+    if (!this.imageSelected(imageFile)) {
       this.selectedImages.push({ ...imageFile, x: 0, y: 0 });
     } else {
       this.selectedImages = this.selectedImages.filter(img => img.url !== imageFile.url || img.alt !== imageFile.alt);
+      if(imageFile.url===this.secondCanvasImage.url){
+        this.secondCanvasImage=null
+        this.secondCanvasMakeEmpty()
+      }
+
     }
-    this.drawImageOnCanvas('firstCanvas');
+    this.addImageToCanvasOne('firstCanvas');
   }
 
-  drawImageOnCanvas(canvasId: string) {
+
+  /**adding image to canvasone */
+  addImageToCanvasOne(canvasId: string) {
     const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
     const context = canvas.getContext('2d');
     
     if (context) {
       canvas.width = 600;
-      canvas.height = 800;
+      canvas.height = 650;
       context.clearRect(0, 0, canvas.width, canvas.height);
 
       this.selectedImages.forEach((image) => {
@@ -66,6 +74,8 @@ export class CanvasOneComponent implements OnInit, OnDestroy {
     }
   }
 
+
+  /**mouse event - mouse cliking time */
   onMouseDown(event: MouseEvent, canvasId: string) {
     const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
     const rect = canvas.getBoundingClientRect();
@@ -82,15 +92,15 @@ export class CanvasOneComponent implements OnInit, OnDestroy {
             this.draggingImage = image;
             this.offsetX = mouseX - image.x;
             this.offsetY = mouseY - image.y;
-            this.originalCanvas = 'firstCanvas'; 
           }
         };
       });
-    } else if (canvasId === 'secondCanvas' && this.draggingImage) {
-      this.originalCanvas = 'secondCanvas'; 
-    }
+    } 
+    
   }
 
+
+  /**mouse moving time */
   onMouseMove(event: MouseEvent) {
     if (this.draggingImage) {
       const canvas = document.querySelector('#firstCanvas') as HTMLCanvasElement;
@@ -101,47 +111,32 @@ export class CanvasOneComponent implements OnInit, OnDestroy {
       this.draggingImage.x = mouseX - this.offsetX;
       this.draggingImage.y = mouseY - this.offsetY;
 
-      if (this.originalCanvas === 'secondCanvas') {
-        this.drawImageOnCanvas('secondCanvas');
-      } else {
-        this.drawImageOnCanvas('firstCanvas');
-      }
+      this.addImageToCanvasOne('firstCanvas');
     }
   }
 
+
+  /**mouse up time */
   onMouseUp(canvasId:string) {
     
     if (canvasId === 'secondCanvas' && this.draggingImage) {
-      // Add the image to the second canvas
-      this.selectedImages = this.selectedImages.filter(img => img !== this.draggingImage);
-      
       this.addToSecondCanvas('secondCanvas');
+      this.secondCanvasImage=this.draggingImage
+      
     }
     this.draggingImage = null;
   }
-
-  ngOnDestroy() {
-    const canvas = document.getElementById('firstCanvas') as HTMLCanvasElement;
-    const canvasTwo = document.getElementById('secondCanvas') as HTMLCanvasElement;
-
-    canvas.removeEventListener('mousedown', (event) => this.onMouseDown(event, 'firstCanvas'));
-    canvas.removeEventListener('mousemove', (event) => this.onMouseMove(event));
-    canvas.removeEventListener('mouseup', () => this.onMouseUp('firstCanvas'));
-
-    canvasTwo.removeEventListener('mousedown', (event) => this.onMouseDown(event, 'secondCanvas'));
-    canvasTwo.removeEventListener('mousemove', (event) => this.onMouseMove(event));
-    canvasTwo.removeEventListener('mouseup', () => this.onMouseUp('secondCanvas'));
-  }
+  
+  
 
 
-
-
+  /**add to second canvas */
   addToSecondCanvas(canvasId: string) {
     const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
     const context = canvas.getContext('2d');
   
     if (context && this.draggingImage) {
-  
+      
       context.clearRect(0, 0, canvas.width, canvas.height);
       const img = new Image();
       img.src = this.draggingImage.url;
@@ -150,6 +145,28 @@ export class CanvasOneComponent implements OnInit, OnDestroy {
       };
     }
   }
+
+  /**when unselection remove from both first and second canvas */
+  secondCanvasMakeEmpty(){
+    const canvas = document.getElementById('secondCanvas') as HTMLCanvasElement;
+    const context = canvas.getContext('2d');
+    if(context){
+      context.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }
+  
+
+  
+    ngOnDestroy() {
+      const canvas = document.getElementById('firstCanvas') as HTMLCanvasElement;
+      const canvasTwo = document.getElementById('secondCanvas') as HTMLCanvasElement;
+  
+      canvas.removeEventListener('mousedown', (event) => this.onMouseDown(event, 'firstCanvas'));
+      canvas.removeEventListener('mousemove', (event) => this.onMouseMove(event));
+      canvas.removeEventListener('mouseup', () => this.onMouseUp('firstCanvas'));
+  
+      canvasTwo.removeEventListener('mouseup', () => this.onMouseUp('secondCanvas'));
+    }
   
 } 
 
