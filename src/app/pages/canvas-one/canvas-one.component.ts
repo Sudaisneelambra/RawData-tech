@@ -44,9 +44,13 @@ export class CanvasOneComponent implements OnInit, OnDestroy {
       this.selectedImages.push({ ...imageFile, x: 0, y: 0 });
     } else {
       this.selectedImages = this.selectedImages.filter(img => img.url !== imageFile.url || img.alt !== imageFile.alt);
-      if(imageFile.url===this.secondCanvasImage.url){
-        this.secondCanvasImage=null
-        this.secondCanvasMakeEmpty()
+      console.log(this.selectedImages);
+      
+      if(this.secondCanvasImage){
+        if( imageFile.url===this.secondCanvasImage.url){
+          this.secondCanvasImage=null
+          this.secondCanvasMakeEmpty()
+        }
       }
 
     }
